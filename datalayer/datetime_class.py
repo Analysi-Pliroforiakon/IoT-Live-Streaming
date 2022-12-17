@@ -8,6 +8,10 @@ class DatetimeClass():
     def step(self):
         self.curr_datetime += timedelta(minutes=15)
         time.sleep(self.wait_secs)
+    #increment datetime by 1 day
+    def step_day(self):
+        self.curr_datetime += timedelta(days=1)
+        time.sleep(self.wait_secs)
     
     
 
