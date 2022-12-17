@@ -19,6 +19,6 @@ def get_random_temperature(timestamp):
     avg_temp = temperatures[month - 1]
 
     # Generate a random temperature within a range of +/- 3 degrees Celsius around the average temperature
-    random_temp = avg_temp + random.uniform(-3, 3)
+    random_temp = avg_temp + random.uniform(-4, 4)
 
     return random_temp
