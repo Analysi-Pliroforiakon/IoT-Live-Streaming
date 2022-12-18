@@ -23,7 +23,7 @@ def get_random_temperature(dt):
 
     return random_temp
 
-class ThermalSensor():
+class ThermalSensors():
     def __init__(self, curr_datetime, skew=0):
         self.peak_temp = self.get_new_peak(curr_datetime)
         self.low_temp = self.get_new_low(curr_datetime)
@@ -31,7 +31,9 @@ class ThermalSensor():
         self.temp_points = (np.sin(np.linspace(math.pi/2, 3*math.pi/2, 14*4))+1)*mean + self.low_temp
         self.curr_pos = 8*4 - 1
         self.skew = skew
-        self.curr_temp = self.temp_points[self.curr_pos] + random.uniform(-0.5+self.skew, 0.5+self.skew)
+        self.curr_temp = self.temp_points[self.curr_pos]
+        self.th1_temp = self.curr_temp + random.uniform(-0.5+self.skew, 0.5+self.skew)
+        self.th2_temp = self.curr_temp + random.uniform(-0.5+self.skew, 0.5+self.skew)
 
     def step(self, curr_datetime):
         #TODO: find pos from hour and minutes
@@ -52,7 +54,9 @@ class ThermalSensor():
         else:
             self.curr_pos += 1
 
-        self.curr_temp = self.temp_points[self.curr_pos] + random.uniform(-0.5+self.skew, 0.5+self.skew)
+        self.curr_temp = self.temp_points[self.curr_pos]
+        self.th1_temp = self.curr_temp + random.uniform(-0.5+self.skew, 0.5+self.skew)
+        self.th2_temp = self.curr_temp + random.uniform(-0.5+self.skew, 0.5+self.skew)
     
     def get_new_peak(self, curr_datetime):
         mean_temp = get_random_temperature(curr_datetime)

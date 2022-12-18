@@ -12,6 +12,8 @@ class DatetimeClass():
     def step_day(self):
         self.curr_datetime += timedelta(days=1)
         time.sleep(self.wait_secs)
+    def setFromDatetime(self, another_datetime):
+        self.curr_datetime = another_datetime
     
     
 
