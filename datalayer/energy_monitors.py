@@ -51,7 +51,7 @@ def calculate_total_energyConsumption(curr_datetime, prev, self):
         print('returned prev: ', prev)
         return prev
 
-class EnergyConsomption():
+class EnergyConsumption():
     def __init__(self, degresOutside, curr_datetime, skew=0, random=False):
         self.degreesOutside = degresOutside
         self.curr_datetime = curr_datetime
