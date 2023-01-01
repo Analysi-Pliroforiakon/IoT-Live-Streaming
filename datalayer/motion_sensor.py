@@ -28,6 +28,36 @@ def timedelta_minutes(td):
     #utility function to get minutes from timedelta format
     return (td.seconds//60)%60
 
+def timedelta_total_seconds(td):
+    return td.total_seconds()
+
+#function to produce motion detections for next 24 hours
+#generates 4-5 motion detections at random intervals
+
+def send_motion_sigs_for_day(datetime_instance, producer=None):
+    curr_time = datetime_instance.curr_datetime
+    intervals = random_intervals()
+    
+    #list of timestamps
+    daily_timestamps = []
+    for intv in intervals:
+        prev_time = curr_time
+        #calculate datetime of next motion detection
+        curr_time = datetime_instance.curr_datetime + datetime.timedelta(minutes=intv)
+        daily_timestamps.append(curr_time)
+        #wait according to the datetime_instance wait_secs
+        #print('time to send next signal:', curr_time)
+        sleep_seconds = datetime_instance.wait_secs * timedelta_total_seconds(curr_time - prev_time)/ (15*60)
+        poll_start_time = time.time()
+        if producer is None:
+            detect_motion(curr_time)
+            time.sleep(sleep_seconds)
+        else:
+            producer.poll(sleep_seconds)
+            time.sleep(sleep_seconds-(time.time()-poll_start_time))
+            producer.produce('Mov1', curr_time, 1)
+
+
 #function to generate motion detections for next 24 hours
 #generates 4-5 motion detections at random intervals and increments datetime_instance by 24 hours
 #returns list of timestamps (optional)
@@ -54,8 +84,10 @@ def detect_for_day(datetime_instance):
     #optionally return timestamps
     return daily_timestamps
 
-total_timestamps = []
-#generate motion for 32 days
-for i in range(32):
-    total_timestamps += detect_for_day(datetime_instance)
-print(len(total_timestamps))
+
+if __name__ == "__main__":
+    total_timestamps = []
+    #generate motion for 32 days
+    for i in range(32):
+        total_timestamps += detect_for_day(datetime_instance)
+    print(len(total_timestamps))
