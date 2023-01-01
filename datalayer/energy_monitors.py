@@ -39,19 +39,19 @@ def calculate_energy_base_on_hours(curr_datetime, type , randomEnergy, skew):
         else:
             return random.uniform(0, 100 * type)
 def calculate_total_energyConsumption(curr_datetime, prev, self):
-    print('hour: ', curr_datetime.hour, ' minute: ', curr_datetime.minute)
+    #print('hour: ', curr_datetime.hour, ' minute: ', curr_datetime.minute)
     if(curr_datetime.hour == 0 and curr_datetime.minute == 0):
 
         w =  2600 * 24 + prev + random.uniform(-1000, 1000)
         self.prevEtot = w
-        print('returned w: ', w)
+        #print('returned w: ', w)
         return w
 
     else:
-        print('returned prev: ', prev)
+        #print('returned prev: ', prev)
         return prev
 
-class EnergyConsomption():
+class EnergyConsumption():
     def __init__(self, degresOutside, curr_datetime, skew=0, random=False):
         self.degreesOutside = degresOutside
         self.curr_datetime = curr_datetime

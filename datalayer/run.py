@@ -2,7 +2,7 @@ from datetime_class import DatetimeClass
 from thermal_sensor import ThermalSensors
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
-from energy_monitors import EnergyConsomption 
+from energy_monitors import EnergyConsumption 
 
 
 
@@ -15,7 +15,7 @@ def runTest(initDate):
     # TH2 = ThermalSensor(datetime.curr_datetime, skew=-0.5)
 
     # air condition sensors
-    energyMon = EnergyConsomption(Sensors.th1_temp, curr_datetime=datetime.curr_datetime, skew=20, random=False)
+    energyMon = EnergyConsumption(Sensors.th1_temp, curr_datetime=datetime.curr_datetime, skew=20, random=False)
     
 
     hvac1_list = []
