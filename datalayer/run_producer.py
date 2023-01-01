@@ -7,10 +7,23 @@ from producer_class import ProducerClass
 import datetime
 import threading
 import time
+import argparse
 
+parser = argparse.ArgumentParser(
+    description="Kafka Producer for Sensor Data",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+
+optional = parser._action_groups.pop()
+optional.add_argument('-w', '--wait-secs', type=float, default=1,
+                help='Seconds that correspond to real quarters of an hour')
+optional.add_argument('-q', '--quarter-limit', type=int, default=None,
+                help='Limit the number of quarters of an hour for which the script is running')
+parser._action_groups.append(optional)
+args = parser.parse_args()
 
 producer = ProducerClass()
-dt = DatetimeClass(wait_secs=0.5)
+dt = DatetimeClass(wait_secs=args.wait_secs)
 
 print(dt.curr_datetime)
 
@@ -23,6 +36,7 @@ energyMon = EnergyConsumption(th_sensors.th1_temp, curr_datetime=dt.curr_datetim
 W1 = WaterSensor(dt.curr_datetime)
 Wtot = TotalWaterSensor(dt.curr_datetime)
 time.sleep(2)
+
 i = 0
 thread = threading.Thread(target=send_motion_sigs_for_day, args=[dt, producer])
 thread.start()
@@ -69,10 +83,10 @@ while True:
         thread = threading.Thread(target=send_motion_sigs_for_day, args=[dt, producer])
         thread.start()
 
-
     i += 1
-    if i == 4*24:
+    if i == args.quarter_limit:
         break
 
 producer.flush()
+print('Main script ended. Press Ctrl+C to kill thread..')
 
