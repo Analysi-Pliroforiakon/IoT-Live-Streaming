@@ -31,7 +31,7 @@ services:
       KAFKA_JMX_HOSTNAME: "kafka0"
       KAFKA_JMX_PORT: 9999
       KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
-
+      KAFKA_LOG_RETENTION_BYTES: 26214400 # set max partition size equal to 25MB
   kafka1:
     image: confluentinc/cp-kafka:7.3.1
     hostname: kafka1
@@ -51,7 +51,8 @@ services:
       KAFKA_JMX_HOSTNAME: "kafka1"
       KAFKA_JMX_PORT: 9999
       KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka1 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
-
+      KAFKA_LOG_RETENTION_BYTES: 26214400
+      
   kafka2:
     image: confluentinc/cp-kafka:7.3.1
     hostname: kafka2
@@ -71,6 +72,7 @@ services:
       KAFKA_JMX_HOSTNAME: "kafka2"
       KAFKA_JMX_PORT: 9999
       KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka2 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+      KAFKA_LOG_RETENTION_BYTES: 26214400
 
   topics_setup:
     image: confluentinc/cp-kafka:7.3.1
@@ -84,6 +86,8 @@ services:
     volumes:
       - ./setup_topics.sh:/setup_topics.sh
     entrypoint: sh -c "/setup_topics.sh"
+    stdin_open: true
+    tty: true
     
   cmak:
     image: ghcr.io/eshepelyuk/dckr/cmak-3.0.0.5:latest
