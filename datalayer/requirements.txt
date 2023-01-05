@@ -2,3 +2,4 @@ numpy
 pillow
 matplotlib
 scipy
+confluent_kafka
