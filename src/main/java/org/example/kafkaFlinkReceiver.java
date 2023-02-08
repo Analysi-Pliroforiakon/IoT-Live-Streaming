@@ -26,7 +26,7 @@ public class kafkaFlinkReceiver {
 
 
     public static KafkaSource<String> getKafkaEnv() throws Exception {
-        String[] inputTopics = {"temperature", "energy"};
+        String[] inputTopics = {"temperature"};
         String server = "localhost:9092";
         return myKafkaSource(inputTopics, server);
     }
