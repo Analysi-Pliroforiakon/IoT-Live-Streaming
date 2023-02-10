@@ -3,15 +3,15 @@ package org.example;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
 //create  a KafkaRecordDeserializationSchema
 
 
-public class kafkaFlinkReceiver {
+public class KafkaFlinkReceiver  {
 
-
-    public static KafkaSource<String> myKafkaSource(String[] inputTopics, String server) throws Exception {
+    private KafkaSource<String> kafkaSource;
+    public void myKafkaSource(String[] inputTopics, String server) throws Exception {
 
         KafkaSource<String> source = KafkaSource.<String>builder()
                 .setBootstrapServers(server)
@@ -21,14 +21,12 @@ public class kafkaFlinkReceiver {
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
 
-        return source;
+       this.kafkaSource = source;
     }
 
 
-    public static KafkaSource<String> getKafkaEnv() throws Exception {
-        String[] inputTopics = {"temperature"};
-        String server = "localhost:9092";
-        return myKafkaSource(inputTopics, server);
+    public KafkaSource<String> getKafkaSource() throws Exception {
+        return this.kafkaSource;
     }
 }
 

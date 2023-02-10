@@ -7,7 +7,7 @@ public class ourTuple {
 
     @Override
     public String toString() {
-        return "Sensor: " + sensor+ " datetime: "+datetime + " value: "+value;
+        return "Sensor: " + sensor + " datetime: " + datetime + " value: " + value;
     }
 //    get sensor
 
