@@ -29,12 +29,12 @@ public class main {
 
 
 //        water -> Sum water for each sensor
-//        KafkaFlinkReceiver waterKafka = new KafkaFlinkReceiver( );
-//        waterKafka.myKafkaSource(new String[]{inputTopics[3]}, "localhost:9092" );
-//
-//        DataStreamClass waterDataStream = new DataStreamClass();
-//
-//        waterDataStream.startFlinking(env, new SumAggregator(), new DiffAggregator(), waterKafka.getKafkaSource(), "Sum Water", 96, 96);
+        KafkaFlinkReceiver waterKafka = new KafkaFlinkReceiver( );
+        waterKafka.myKafkaSource(new String[]{inputTopics[3]}, "localhost:9092" );
+
+        DataStreamClass waterDataStream = new DataStreamClass();
+
+        waterDataStream.startFlinking(env, new SumAggregator(), new DiffAggregator(), waterKafka.getKafkaSource(), "Sum Water", 96);
         env.execute("Flink Streaming Java API Skeleton");
 
     }
