@@ -53,10 +53,10 @@ while True:
     producer.produce('MiAC1', dt.curr_datetime, energyMon.MiAC1)
     producer.produce('MiAC2', dt.curr_datetime, energyMon.MiAC2)
 
-    # handle total energy
+    # handle total energy and total water
     if dt.curr_datetime.hour == 0 and dt.curr_datetime.minute == 0:
         producer.produce('Etot', dt.curr_datetime, energyMon.Etot)
-        # producer.produce('Wtot', dt.curr_datetime, Wtot.get_measurement())
+        producer.produce('Wtot', dt.curr_datetime, Wtot.get_measurement())
 
     # handle water consumption
     water_1 = W1.get_measurement()

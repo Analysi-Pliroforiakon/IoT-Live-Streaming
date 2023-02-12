@@ -29,6 +29,6 @@ class ProducerClass(confluent_kafka.Producer):
         else:
             topic = 'new_topic'
 
-        msg = f'{sensor} | {curr_datetime} | {value}'
+        msg = f'{sensor} | {curr_datetime.strftime("%Y-%m-%d %H:%M")} | {value}'
         print(f'\t{sensor}: {msg}')
         super().produce(topic, key=sensor, value=msg, callback=acked)
