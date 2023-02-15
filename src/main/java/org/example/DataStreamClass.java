@@ -104,7 +104,16 @@ public class DataStreamClass {
 		@Override
         public void flatMap(String input, Collector<ourTuple> output) throws Exception {
             String[] words = input.split("\\|");
-            float value = Float.parseFloat(words[2]);
+           // Check if float
+            float value;
+            try {
+                Float.parseFloat(words[2]);
+                value = Float.parseFloat(words[2]);
+            } catch(NumberFormatException e) {
+                // Not float
+            	value = 0f; 
+            }
+            
             ourTuple tuple = new ourTuple();
             //Remove space at the end of sensor type string
             tuple.sensor = Optional.ofNullable(words[0])
