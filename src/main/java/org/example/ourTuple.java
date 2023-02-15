@@ -13,7 +13,7 @@ public class ourTuple implements Serializable{
 
     @Override
     public String toString() {
-        return "Sensor: " + sensor + " datetime: " + datetime + " value: " + value + "";
+        return sensor + " |" + datetime + "| " + value;
     }
 //    get sensor
 
