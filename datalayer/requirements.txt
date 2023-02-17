@@ -3,3 +3,5 @@ pillow
 matplotlib
 scipy
 confluent_kafka
+requests
+avro

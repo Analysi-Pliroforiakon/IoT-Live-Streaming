@@ -1,0 +1,18 @@
+{
+    "type": "record",
+    "name": "TopicValue",
+    "fields": [
+        {
+            "name": "sensorID",
+            "type": "string"
+        },
+        {
+            "name": "timestamp",
+            "type": "float"
+        },
+        {
+            "name": "value",
+            "type": "float"
+        }
+    ]
+}

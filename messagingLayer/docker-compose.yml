@@ -32,6 +32,13 @@ services:
       KAFKA_JMX_PORT: 9999
       KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
       KAFKA_LOG_RETENTION_BYTES: 26214400 # set max partition size equal to 25MB
+    # healthcheck:
+    #   test: kafka-topics --bootstrap-server broker:29092 --list
+    #   interval: 30s
+    #   timeout: 30s
+    #   retries: 10
+    #   start_period: 10s
+  
   kafka1:
     image: confluentinc/cp-kafka:7.3.1
     hostname: kafka1
@@ -112,3 +119,98 @@ services:
       - "zookeeper"
     volumes:
       - "${PWD}/cmak_cluster_config.yaml:/app/etc/cmak_cluster_config.yaml:ro"
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.3.1
+    hostname: schema-registry
+    container_name: schema-registry
+    restart:  unless-stopped
+    depends_on:
+      - kafka0
+      # kafka0:
+        # condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka0:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "localhost:8081/subjects"]
+    #   interval: 30s
+    #   timeout: 30s
+    #   retries: 10
+    #   start_period: 10s
+
+  kafka-connect-cp:
+    image: confluentinc/cp-kafka-connect:7.3.1
+    container_name: kafka-connect-cp
+    depends_on:
+      - zookeeper
+      - kafka0
+      - schema-registry
+    ports:
+      - 8083:8083
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: "kafka0:29092"
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect-cp"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "3"
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "3"
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "3"
+      CONNECT_PLUGIN_PATH: '/usr/share/java'
+    volumes:
+      #- $PWD/scripts:/scripts
+      #- ./connectors/kafka-connect-hbase-kafka-2-8-4.0.0/kafka-connect-hbase-kafka-3-1-assembly-4.0.0.jar:/usr/share/java/kafka-connect-hbase-kafka-3-1-assembly-4.0.0.jar
+      - ./connectors:/usr/share/java/kafka-connect-hbase
+    command:
+      - bash
+      - -c
+      - |
+        sleep infinity &
+        /etc/confluent/docker/run
+
+  # hbase:
+  #   image: harisekhon/hbase
+  #   container_name: hbase
+  #   hostname: hbase  
+  #   ports:
+  #     - 2181:2181
+
+  # hbase-master:
+  #   image: harisekhon/hbase:${VERSION:-latest}
+  #   command: master
+  #   ports:
+  #     - 16000:16000
+  #     - 16010:16010
+  # hbase-regionserver:
+  #   image: harisekhon/hbase:${VERSION:-latest}
+  #   command: regionserver
+  #   ports:
+  #     - 16030:16030
+  #     - 16201:16201
+  #     - 16301:16301
+  # hbase-thrift:
+  #   image: harisekhon/hbase:${VERSION:-latest}
+  #   command: thrift
+  #   ports:
+  #     - 9090:9090
+  #     - 9095:9095
+  # hbase-stargate:
+  #   image: harisekhon/hbase:${VERSION:-latest}
+  #   command: stargate
+  #   ports:
+  #     - 8080:8080
+  #     - 8085:8085
