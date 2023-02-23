@@ -36,6 +36,7 @@ public class main {
 
         DataStreamClass waterDataStream = new DataStreamClass();
 
+
         waterDataStream.startFlinking(env, new SumAggregator(), new DiffAggregator(), new RestAggregator(), waterKafka.getKafkaSource(), "Sum Water", 96);
         
         //motion -> Count motion detections per day
