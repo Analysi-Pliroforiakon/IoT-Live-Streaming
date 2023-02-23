@@ -1,7 +1,6 @@
-package org.example;
+package org.flink;
 
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 
 public class SumAggregator implements AggregateFunction<ourTuple, aggregateHelper, ourTuple> {
 

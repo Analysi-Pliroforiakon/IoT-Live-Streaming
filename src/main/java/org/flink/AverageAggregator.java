@@ -1,4 +1,4 @@
-package org.example;
+package org.flink;
 
 import org.apache.flink.api.common.functions.AggregateFunction;
 
