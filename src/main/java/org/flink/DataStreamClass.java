@@ -1,40 +1,21 @@
-package org.example;
-
-import org.apache.flink.api.common.eventtime.TimestampAssigner;
-import org.apache.flink.api.common.eventtime.WatermarkGenerator;
-import org.apache.flink.api.common.eventtime.WatermarkOutput;
+package org.flink;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.api.connector.sink.Sink;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.connector.base.DeliveryGuarantee;
+import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
-import org.apache.flink.streaming.api.datastream.AllWindowedStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks;
-import org.apache.flink.streaming.api.functions.AssignerWithPunctuatedWatermarks;
-import org.apache.flink.streaming.api.functions.sink.SinkFunction;
-import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.util.Collector;
-
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Optional;
-import java.util.Properties;
 
 public class DataStreamClass {
 
@@ -62,7 +43,11 @@ public class DataStreamClass {
                 .aggregate(dailyAggregateFunction);
         
     	DataStream<ourTuple> finalStream = newStream.union(totStream);
-        
+
+//        make connection for hbase sink
+        MyHbaseSink myHbaseSink = new MyHbaseSink();
+          myHbaseSink.initialize("localhost", "2181", "rawData");
+        finalStream.addSink(myHbaseSink.sinkFunction);
     	
     	KafkaSink<ourTuple> sink = KafkaSink.<ourTuple>builder()
                 .setBootstrapServers("localhost:9092")
@@ -74,8 +59,8 @@ public class DataStreamClass {
                                 )
                                 .build()
                 )
-
                 .build();
+
     	//Checking if topic is energy or water. If true calculate rest aggregator
     	if(jobName.contains("Sum")) {
     	    SingleOutputStreamOperator<ourTuple> restStream =  finalStream

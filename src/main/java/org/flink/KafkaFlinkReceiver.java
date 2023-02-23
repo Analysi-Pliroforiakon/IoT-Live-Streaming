@@ -1,9 +1,8 @@
-package org.example;
+package org.flink;
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
-import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
 //create  a KafkaRecordDeserializationSchema
 

@@ -1,4 +1,4 @@
-package org.example;
+package org.flink;
 
 import java.text.ParseException;
 
