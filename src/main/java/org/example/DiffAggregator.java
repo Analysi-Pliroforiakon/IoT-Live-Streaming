@@ -11,8 +11,7 @@ public class DiffAggregator implements AggregateFunction<ourTuple, aggregateHelp
 
         @Override
         public aggregateHelper add(ourTuple tuple, aggregateHelper aggregateHelper) {
-
-            aggregateHelper.variant = tuple.sensor;
+        	aggregateHelper.setVariant("AggDayDiff", tuple.sensor);
             aggregateHelper.timestamp = tuple.datetime;
             //This is difference (last value - new value)
 //            System.out.println("Previous value: " +  aggregateHelper.sum);

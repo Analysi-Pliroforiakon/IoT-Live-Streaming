@@ -1,9 +1,10 @@
 package org.example;
 
-import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import java.text.ParseException;
 
-public class SumAggregator implements AggregateFunction<ourTuple, aggregateHelper, ourTuple> {
+import org.apache.flink.api.common.functions.AggregateFunction;
+
+public class MovCountAggregator implements AggregateFunction<ourTuple, aggregateHelper, ourTuple> {
 
         @Override
         public aggregateHelper createAccumulator() {
@@ -12,7 +13,7 @@ public class SumAggregator implements AggregateFunction<ourTuple, aggregateHelpe
 
         @Override
         public aggregateHelper add(ourTuple tuple, aggregateHelper aggregateHelper) {
-        	aggregateHelper.setVariant("AggDay", tuple.sensor);
+        	aggregateHelper.setVariant("AggDayMov", tuple.sensor);
             aggregateHelper.timestamp = tuple.datetime;
             aggregateHelper.count = aggregateHelper.count + 1f;
             aggregateHelper.sum = aggregateHelper.sum + tuple.value;
@@ -23,6 +24,11 @@ public class SumAggregator implements AggregateFunction<ourTuple, aggregateHelpe
         public ourTuple getResult(aggregateHelper aggregateHelper) {
         	ourTuple tuple = new ourTuple();
             tuple.sensor = aggregateHelper.variant;
+            try {
+				aggregateHelper.setTimestamp();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
             tuple.datetime = aggregateHelper.timestamp;
             tuple.value = aggregateHelper.sum;
             return tuple;

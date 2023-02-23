@@ -14,7 +14,7 @@ public class AverageAggregator implements AggregateFunction<ourTuple, aggregateH
     @Override
     public aggregateHelper add(ourTuple tuple, aggregateHelper aggregateHelper) {
 
-        aggregateHelper.variant = tuple.sensor;
+        aggregateHelper.setVariant("AggDay", tuple.sensor);
         aggregateHelper.timestamp = tuple.datetime;
         aggregateHelper.count = aggregateHelper.count + 1f;
         aggregateHelper.sum = aggregateHelper.sum + tuple.value;
@@ -38,7 +38,6 @@ public class AverageAggregator implements AggregateFunction<ourTuple, aggregateH
         aggregateHelper.count = aggregateHelper.count + acc1.count;
         return aggregateHelper;
     }
-
 
 }
 
