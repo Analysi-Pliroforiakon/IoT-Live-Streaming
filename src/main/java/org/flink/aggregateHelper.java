@@ -31,12 +31,14 @@ public class aggregateHelper {
     
     public void setTimestamp() throws ParseException {
     	String dt = timestamp;
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    	//If time is 00:00 do not advance day
+    	boolean o_clock = timestamp.contains("00:00");
     	
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     	
     	Calendar c = Calendar.getInstance();
     	c.setTime(sdf.parse(dt));
-    	c.add(Calendar.DATE, 1);  // number of days to add
+    	if(!o_clock) c.add(Calendar.DATE, 1);  // number of days to add
     	dt = sdf.format(c.getTime());  // dt is now the new date
     	dt += " 00:00";
     	timestamp = dt;

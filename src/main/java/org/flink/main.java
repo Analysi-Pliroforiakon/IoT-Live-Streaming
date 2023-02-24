@@ -6,7 +6,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 public class main {
     public static void main(String[] args) throws Exception{
 
-//    	This is to fix an error that occurs when running many streams at the same time
+        // This is to fix an error that occurs when running many streams at the same time
     	Configuration cfg = new Configuration();
     	int defaultLocalParallelism = Runtime.getRuntime().availableProcessors();
     	cfg.setString("taskmanager.memory.network.max", "1gb");
@@ -14,7 +14,7 @@ public class main {
 
         String[] inputTopics = {"temperature", "energy", "motion", "water"};
 
-//        // for temperature -> AVG temperature for each sensor
+        // for temperature -> AVG temperature for each sensor
         KafkaFlinkReceiver temperatureKafka = new KafkaFlinkReceiver();
         temperatureKafka.myKafkaSource(new String[]{inputTopics[0]}, "localhost:9092" );
 
@@ -29,13 +29,11 @@ public class main {
 
         energyDataStream.startFlinking(env, new SumAggregator(), new DiffAggregator(), new RestAggregator(), energyKafka.getKafkaSource(), "Sum Energy", 96);
 
-
-//        water -> Sum water for each sensor
+        // water -> Sum water for each sensor
         KafkaFlinkReceiver waterKafka = new KafkaFlinkReceiver( );
         waterKafka.myKafkaSource(new String[]{inputTopics[3]}, "localhost:9092" );
 
         DataStreamClass waterDataStream = new DataStreamClass();
-
 
         waterDataStream.startFlinking(env, new SumAggregator(), new DiffAggregator(), new RestAggregator(), waterKafka.getKafkaSource(), "Sum Water", 96);
         
@@ -46,9 +44,7 @@ public class main {
         DataStreamClass motionDataStream = new DataStreamClass();
         
         motionDataStream.startFlinking(env, new MovCountAggregator(), new DiffAggregator(), new RestAggregator(), motionKafka.getKafkaSource(), "Count Motion", 96);
-//        
+      
         env.execute("Flink Streaming Java API Skeleton");
-        
-
     }
 }

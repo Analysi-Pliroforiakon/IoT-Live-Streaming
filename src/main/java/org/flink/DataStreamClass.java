@@ -108,9 +108,7 @@ public class DataStreamClass {
     static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy:MM:dd HH:mm");
 
     public static class Splitter implements FlatMapFunction<String, ourTuple> {
-        /**
-		 * 
-		 */
+        
 		private static final long serialVersionUID = 1L;
 
 		@Override

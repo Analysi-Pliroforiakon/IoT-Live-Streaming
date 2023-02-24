@@ -1,9 +1,11 @@
 package org.flink;
 
+import java.text.ParseException;
+
 import org.apache.flink.api.common.functions.AggregateFunction;
 
-public class SumAggregator implements AggregateFunction<ourTuple, aggregateHelper, ourTuple> {
-
+public class SumAggregator implements AggregateFunction<ourTuple, aggregateHelper, ourTuple> { 
+	    	   
         @Override
         public aggregateHelper createAccumulator() {
             return new aggregateHelper();
@@ -22,6 +24,14 @@ public class SumAggregator implements AggregateFunction<ourTuple, aggregateHelpe
         public ourTuple getResult(aggregateHelper aggregateHelper) {
         	ourTuple tuple = new ourTuple();
             tuple.sensor = aggregateHelper.variant;
+            //Increase timestamp for water sensor, so that it is correctly aligned
+            if(aggregateHelper.variant.contains("W1")) {
+            	try {
+    				aggregateHelper.setTimestamp();
+    			} catch (ParseException e) {
+    				e.printStackTrace();
+    			}	
+            }
             tuple.datetime = aggregateHelper.timestamp;
             tuple.value = aggregateHelper.sum;
             return tuple;
@@ -33,6 +43,4 @@ public class SumAggregator implements AggregateFunction<ourTuple, aggregateHelpe
             aggregateHelper.count = aggregateHelper.count + acc1.count;
             return aggregateHelper;
         }
-
-
 }
