@@ -31,7 +31,6 @@ public class MovCountAggregator implements AggregateFunction<ourTuple, aggregate
 			}
             tuple.datetime = aggregateHelper.timestamp;
             tuple.value = aggregateHelper.sum;
-            
             return tuple;
         }
 

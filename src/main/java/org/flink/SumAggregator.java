@@ -33,6 +33,9 @@ public class SumAggregator implements AggregateFunction<ourTuple, aggregateHelpe
     			}	
             }
             tuple.datetime = aggregateHelper.timestamp;
+            //If date is too early label aggregation as not yet applicable
+            //These aggregations are filtered out on DataStreamClass
+            if(tuple.sensor == null || tuple.datetime != null && tuple.toTimestampLong() <= 1577829600000L) tuple.sensor = "NotApplicable";
             tuple.value = aggregateHelper.sum;
             return tuple;
         }

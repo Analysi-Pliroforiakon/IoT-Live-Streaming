@@ -28,6 +28,9 @@ public class DiffAggregator implements AggregateFunction<ourTuple, aggregateHelp
         	ourTuple tuple = new ourTuple();
             tuple.sensor = aggregateHelper.variant;
             tuple.datetime = aggregateHelper.timestamp;
+            //If date is too early label aggregation as not yet applicable
+            //These aggregations are filtered out on DataStreamClass
+            if(tuple.sensor == null || tuple.datetime != null && tuple.toTimestampLong() <= 1577829600000L) tuple.sensor = "NotApplicable";
             //This returns differences of new and last measurement
             tuple.value = aggregateHelper.count;
             return tuple;

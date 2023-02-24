@@ -27,6 +27,9 @@ public class AverageAggregator implements AggregateFunction<ourTuple, aggregateH
     	ourTuple tuple = new ourTuple();
         tuple.sensor = aggregateHelper.variant;
         tuple.datetime = aggregateHelper.timestamp;
+        //If date is too early label aggregation as not yet applicable
+        //These aggregations are filtered out on DataStreamClass
+        if(tuple.sensor == null || tuple.datetime != null && tuple.toTimestampLong() <= 1577829600000L) tuple.sensor = "NotApplicable";
         tuple.value = (aggregateHelper.sum / aggregateHelper.count);
         return tuple;
     }

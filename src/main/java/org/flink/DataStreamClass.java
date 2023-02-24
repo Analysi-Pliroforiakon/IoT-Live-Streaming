@@ -78,15 +78,20 @@ public class DataStreamClass {
                 .build();
 
     	//Checking if topic is energy or water. If true calculate rest aggregator
+    	//Filters out Not Applicable aggregation
     	if(jobName.contains("Sum")) {
     	    SingleOutputStreamOperator<ourTuple> restStream =  finalStream
     	    		.windowAll(TumblingEventTimeWindows.of(Time.days(1), Time.minutes(-119)))
     	    		.aggregate(restAggregateFunction);
-    	    
-            finalStream.sinkTo(sink);
+    	    		
+            finalStream
+	            .filter(value -> !value.sensor.contains("NotApplicable"))
+	            .sinkTo(sink);
             System.out.println("Adding a sink done");
             
-            restStream.sinkTo(sink);
+            restStream
+	            .filter(value -> !value.sensor.contains("NotApplicable"))
+	            .sinkTo(sink);
             System.out.println("Adding rest sink done");
             
             //This is the dataStream of late rejected events
@@ -98,7 +103,9 @@ public class DataStreamClass {
     	//If topic is not energy or water, do not calculate rest aggregator
     	else {
 
-            finalStream.sinkTo(sink);
+    		finalStream
+	            .filter(value -> !value.sensor.contains("NotApplicable"))
+	            .sinkTo(sink);
             System.out.println("Adding a sink done");
             
     	}
