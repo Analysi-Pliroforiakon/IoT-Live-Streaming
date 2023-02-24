@@ -38,6 +38,6 @@ public class ourTuple implements Serializable{
             // handle exception
             return 0L;
         }
-    	//return Long.parseLong(datetime);
+    	
     }
 }

@@ -30,24 +30,30 @@ public class DataStreamClass {
                                 .withIdleness(Duration.ofSeconds(1))
                 );
     	
+    	
+    	//Offset parameter is set to Time.mintues(-119) for two reasons:
+    	//First, local machine time is EET, which is GMT+2, so we need the offset to be -120 min
+    	//Second, if offset was -120 min, then the window would be [00:00, 23:59]
+    	//we want the window to be [00:01, 00:00 (next day)], as the latest timestamp can be 23:59:00 (on motion sensor)
+    	//So, we offset another minute: -120 + 1 = 119
     	SingleOutputStreamOperator<ourTuple> newStream = dataStream
                 .filter(value -> !value.sensor.contains("tot"))
                 .keyBy(value -> value.sensor)
-                .window(TumblingEventTimeWindows.of(Time.days(1)))
+                .window(TumblingEventTimeWindows.of(Time.days(1), Time.minutes(-119)))
                 .aggregate(quarterAggregateFunction);
                 
     	SingleOutputStreamOperator<ourTuple> totStream = dataStream
                 .filter(value -> value.sensor.contains("tot"))
                 .keyBy(value -> value.sensor)
-                .window(SlidingEventTimeWindows.of(Time.days(2), Time.days(1)))
+                .window(SlidingEventTimeWindows.of(Time.days(2), Time.days(1), Time.minutes(-119)))
                 .aggregate(dailyAggregateFunction);
         
     	DataStream<ourTuple> finalStream = newStream.union(totStream);
 
-//        make connection for hbase sink
-        MyHbaseSink myHbaseSink = new MyHbaseSink();
-          myHbaseSink.initialize("localhost", "2181", "rawData");
-        finalStream.addSink(myHbaseSink.sinkFunction);
+////        make connection for hbase sink
+//        MyHbaseSink myHbaseSink = new MyHbaseSink();
+//          myHbaseSink.initialize("localhost", "2181", "rawData");
+//        finalStream.addSink(myHbaseSink.sinkFunction);
     	
     	KafkaSink<ourTuple> sink = KafkaSink.<ourTuple>builder()
                 .setBootstrapServers("localhost:9092")
@@ -64,7 +70,7 @@ public class DataStreamClass {
     	//Checking if topic is energy or water. If true calculate rest aggregator
     	if(jobName.contains("Sum")) {
     	    SingleOutputStreamOperator<ourTuple> restStream =  finalStream
-    	    		.windowAll(TumblingEventTimeWindows.of(Time.days(1)))
+    	    		.windowAll(TumblingEventTimeWindows.of(Time.days(1), Time.minutes(-119)))
     	    		.aggregate(restAggregateFunction);
     	    
             finalStream.sinkTo(sink);
