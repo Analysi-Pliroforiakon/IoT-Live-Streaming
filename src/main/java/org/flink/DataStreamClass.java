@@ -2,7 +2,6 @@ package org.flink;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -13,6 +12,7 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.util.Collector;
+import org.apache.flink.util.OutputTag;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Optional;
@@ -20,26 +20,36 @@ import java.util.Optional;
 public class DataStreamClass {
 
     public void startFlinking(StreamExecutionEnvironment env, AggregateFunction<ourTuple, aggregateHelper, ourTuple> quarterAggregateFunction, AggregateFunction<ourTuple, aggregateHelper, ourTuple> dailyAggregateFunction, AggregateFunction<ourTuple, aggregateHelper, ourTuple> restAggregateFunction, KafkaSource<String> kafkaSource, String jobName, int dailyPeriod) throws Exception {
-
+        
+    	//This is used to handle rejected late events
+    	final OutputTag<ourTuple> lateOutputTag = new OutputTag<ourTuple>("late-data"){
+			private static final long serialVersionUID = 1L;};
+    	
+    	//Max out-of-orderness. 2 days for water, 0 for all other sensors
+    	int oooness = 0;
+    	if(jobName.contains("Water")) oooness = 2;
+    	
     	SingleOutputStreamOperator<ourTuple> dataStream = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "KafkaSource")
                 .flatMap(new Splitter())
                 .assignTimestampsAndWatermarks(
                         WatermarkStrategy.
-                        <ourTuple>forMonotonousTimestamps()
+                        <ourTuple>forBoundedOutOfOrderness(Duration.ofDays(oooness))
                                 .withTimestampAssigner((event, timestamp) -> event.toTimestampLong())
                                 .withIdleness(Duration.ofSeconds(1))
                 );
-    	
     	
     	//Offset parameter is set to Time.mintues(-119) for two reasons:
     	//First, local machine time is EET, which is GMT+2, so we need the offset to be -120 min
     	//Second, if offset was -120 min, then the window would be [00:00, 23:59]
     	//we want the window to be [00:01, 00:00 (next day)], as the latest timestamp can be 23:59:00 (on motion sensor)
     	//So, we offset another minute: -120 + 1 = 119
+    	
+    	//SideOutputLateData is used to handle late events for sensor W1
     	SingleOutputStreamOperator<ourTuple> newStream = dataStream
                 .filter(value -> !value.sensor.contains("tot"))
                 .keyBy(value -> value.sensor)
                 .window(TumblingEventTimeWindows.of(Time.days(1), Time.minutes(-119)))
+                .sideOutputLateData(lateOutputTag)
                 .aggregate(quarterAggregateFunction);
                 
     	SingleOutputStreamOperator<ourTuple> totStream = dataStream
@@ -78,6 +88,10 @@ public class DataStreamClass {
             
             restStream.sinkTo(sink);
             System.out.println("Adding rest sink done");
+            
+            //This is the dataStream of late rejected events
+            DataStream<ourTuple> lateStream = newStream.getSideOutput(lateOutputTag);
+            lateStream.sinkTo(sink);
     	    
     	}
         
