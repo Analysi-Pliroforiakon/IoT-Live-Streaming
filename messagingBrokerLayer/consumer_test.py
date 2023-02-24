@@ -37,6 +37,6 @@ conf = {
 
 consumer = Consumer(conf)
 
-basic_consume_loop(consumer, topics=['test_topic', 'temperature'])
+basic_consume_loop(consumer, topics=['aggrs'])
 
 
