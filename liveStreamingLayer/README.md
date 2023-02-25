@@ -7,7 +7,7 @@
 ## Setup in Eclipse IDE
 
 - File > Import... > Select an import wizard > Maven > Existing Maven Project
-- Root Directory: "YourPathTo\APS\liveStreamingLayer\java-flink-kafka"
+- Root Directory: "YourPathTo\APS\liveStreamingLayer"
 - Select "pom.xml" > Finish
 - Run Configurations > JRE > 'Project execution environment JavaSE-11 (jre)'
 
