@@ -18,15 +18,15 @@
 ## Table with sensor aggs
 |Index|Sensor Name| Topic | Sensor Interval| Required Function|
 | ---| --- | --- | --- | ---|
-|1 |TH1 | Temperature | 15 min | AggDay[x] = AVG temperature for each sensor |
-|2|TH2 | Temperature | 15 min| AggDay[x] = AVG temperature for each sensor | 
-|3 | HVAC1| Energy | 15 min | AggDay[x] = Sum wh for each sensor | 
-|4 | HVAC2| Energy | 15 min | AggDay[x] = Sum wh for each sensor | 
-|5 | MiAc1| Energy | 15 min | AggDay[x] = Sum wh for each sensor|
-|6 | MiAc2| Energy | 15 min | AggDay[x] = Sum wh for each sensor|
-|7| W1 | Water | 15 min | AggDay[x] = Sum litres of the day for sensor |
-|8 | Etot | Energy | 1 day | AggDayDiff[y] = diff of value of day with value of previous day|
-|9|Wtot | Water | 1 day | AggDayDiff[y] =  diff of value of day with value of previous day |
+|1 |TH1 | Temperature | 15 min | AggDay[TH1] = AVG temperature for each sensor |
+|2|TH2 | Temperature | 15 min| AggDay[TH2] = AVG temperature for each sensor | 
+|3 | HVAC1| Energy | 15 min | AggDay[HVAC1] = Sum wh for each sensor | 
+|4 | HVAC2| Energy | 15 min | AggDay[HVAC2] = Sum wh for each sensor | 
+|5 | MiAC1| Energy | 15 min | AggDay[MiAC1] = Sum wh for each sensor|
+|6 | MiAC2| Energy | 15 min | AggDay[MiAC2] = Sum wh for each sensor|
+|7| W1 | Water | 15 min | AggDay[W1] = Sum litres of the day for sensor |
+|8 | Etot | Energy | 1 day | AggDayDiff[Etot] = Diff of value of day with value of previous day|
+|9|Wtot | Water | 1 day | AggDayDiff[Wtot] =  Diff of value of day with value of previous day |
 |10 | Etot | Energy | 1 day| AggDayRest[Etot] = AggDayDiff[Etot] - AggDay[HVAC1] - AggDay[HVAC2] - AggDay[MiAC1] - AggDay[MiAC2] |
 |11| Wtot | Water | 1 day | AggDayRest[Wtot] = AggDayDiff[Wtot] – AggDay[W1] |
-|12| Mov1 | Motion | Random | AggDay[x] = SUM of movements of the day for the sensor|
+|12| Mov1 | Motion | Random | AggDayMov[Mov1] = Sum of movements of the day for the sensor|
