@@ -1,17 +1,21 @@
 import happybase
 connection = happybase.Connection('localhost', 9090)
-tables = ['raw', 'late', 'aggregated']
-for table in tables:
-    try:
-        connection.delete_table(table, disable=True)
-    except:
-        print(f'Table {table} does not exist')
-        pass
+tables = ['rawData', 'lateData', 'aggregatedData']
+
+tablesExisted = connection.tables()
 
 for table in tables:
-    try:
-        connection.create_table(table, { 'f': dict() } )
-        print(f'Table {table} created')
-    except:
-        print(f'Table {table} already exists')
-        pass
+    if table in tablesExisted:
+        try:
+            connection.delete_table(table, disable=True)
+        except:
+            print(f'Table {table} does not exist')
+            pass
+    else :
+        print(f'Table {table} does not exist')
+        try:
+            connection.create_table(table, { 'cf': dict() } )
+            print(f'Table {table} created')
+        except:
+            print(f'Table {table} already exists')
+            pass

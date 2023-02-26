@@ -30,3 +30,8 @@
 |10 | Etot | Energy | 1 day| AggDayRest[Etot] = AggDayDiff[Etot] - AggDay[HVAC1] - AggDay[HVAC2] - AggDay[MiAC1] - AggDay[MiAC2] |
 |11| Wtot | Water | 1 day | AggDayRest[Wtot] = AggDayDiff[Wtot] – AggDay[W1] |
 |12| Mov1 | Motion | Random | AggDayMov[Mov1] = Sum of movements of the day for the sensor|
+
+
+# How we habdle late events.
+
+
