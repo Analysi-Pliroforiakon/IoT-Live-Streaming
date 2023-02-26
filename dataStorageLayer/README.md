@@ -35,7 +35,12 @@ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 ```
 ./bin/start-hbase.sh
 ```
+# WSL and Windows
 
+In order to make this work , check the host address of the WSL with this command.
+```
+wsl hostname -I
+```
 # Tables
 1. live data table
 2. aggregated data table
