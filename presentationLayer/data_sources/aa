@@ -1,0 +1,1 @@
+{"id":10,"uid":"6ZP4WnbVz","orgId":1,"name":"WebSocket API","type":"golioth-websocket-datasource","typeName":"WebSocket API","typeLogoUrl":"public/plugins/golioth-websocket-datasource/img/logo.svg","access":"proxy","url":"","user":"","database":"","basicAuth":false,"isDefault":true,"jsonData":{"host":"ws://192.168.1.1:1234"},"readOnly":false}

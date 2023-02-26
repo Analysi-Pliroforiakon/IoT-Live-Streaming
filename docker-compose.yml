@@ -84,7 +84,7 @@ services:
       - kafka1
       - kafka2
     volumes:
-      - ./setup_topics.sh:/setup_topics.sh
+      - ./messagingBrokerLayer/setup_topics.sh:/setup_topics.sh
     entrypoint: sh -c "/setup_topics.sh"
     stdin_open: true
     tty: true
@@ -111,4 +111,28 @@ services:
     depends_on:
       - "zookeeper"
     volumes:
-      - "${PWD}/cmak_cluster_config.yaml:/app/etc/cmak_cluster_config.yaml:ro"
+      - "${PWD}/messagingBrokerLayer/cmak_cluster_config.yaml:/app/etc/cmak_cluster_config.yaml:ro"
+
+  hbase:
+    image: dajobe/hbase
+    hostname: hbase
+    container_name: hbase
+    ports:
+      - "16010:16010" # Master Web UI
+      - "8080:8080"   # REST API
+      - "8085:8085"   # REST UI
+      - "9090:9090"   # Thrift API
+      - "9095:9095"   # Thrift UI
+    volumes:
+      - ${PWD}/dataStorageLayer/hbase_files/data:/data
+
+  grafana:
+    image: grafana/grafana-oss
+    hostname: grafana
+    container_name: grafana_docker
+    ports:
+      - "3000:3000"
+    environment:
+      GF_INSTALL_PLUGINS: "golioth-websocket-datasource"
+    # volumes:
+    #   - ../presentationLayer:/imports_exports
