@@ -1,1 +1,3 @@
 happybase
+confluent_kafka
+argparse

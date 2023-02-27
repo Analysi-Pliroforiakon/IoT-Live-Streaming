@@ -1,13 +1,27 @@
 from confluent_kafka import Consumer, KafkaError, KafkaException
 import happybase
 import sys
+import argparse
 
+# you must specify the table of kafka
+
+parser = argparse.ArgumentParser(
+    description="Sync your data from kafka topic to hbase",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+
+requiered = parser._action_groups.pop()
+requiered.add_argument('-t', '--table', type=str, default='raw',
+                help='Table name in HBase', required=True)
+parser._action_groups.append(requiered)
+args = parser.parse_args()
 
 
 KAFKA_BOOTSTRAP = 'localhost:9092'
 HBASE_SERVER = 'localhost'
 HBASE_PORT = 9090
-TOPICS = ['raw','aggregated', 'late']
+# TOPICS = ['raw','aggregated', 'late']
+TOPIC = args.table
 RUNNING = True
 
 
@@ -142,13 +156,13 @@ conf = {
     
 }
 
-for topic in TOPICS:
-    tableName = topic + "Data"
-    consumer = Consumer(conf)
-    pool, table =  valid_table_and_connection(tableName=tableName)
-    # max timestamp is the latest timestamp already in the table .
-    if topic == 'aggregated' :
-        max_timestamp = valid_datetime(table=table)
-        basic_consume_loop(consumer, topics=[topic], validate=True, max_timestamp=max_timestamp)
-        continue
-    basic_consume_loop(consumer, topics=[topic])
+
+tableName = TOPIC + "Data"
+consumer = Consumer(conf)
+pool, table =  valid_table_and_connection(tableName=tableName)
+# max timestamp is the latest timestamp already in the table .
+# if TOPIC == 'aggregated' :
+#     max_timestamp = valid_datetime(table=table)
+#     basic_consume_loop(consumer, TOPICs=[TOPIC], validate=True, max_timestamp=max_timestamp)
+#     continue
+basic_consume_loop(consumer, topics=[TOPIC])
