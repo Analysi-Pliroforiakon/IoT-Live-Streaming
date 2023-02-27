@@ -1,8 +1,11 @@
 #!/bin/bash
-
+echo "Installing requirements"
 pip3 install -r ./dataStorageLayer/requirements.txt
-# for raw late and aggregated run a loop to sync data
-for table in raw late aggregated
-do
-    python3 ./dataStorageLayer/syncData.py -t $table
-done
+
+echo "Creating tables"
+python3  ./dataStorageLayer/hbase_files/hbase_make_clear_tables.py
+
+
+echo "Syncing data..."
+python3 ./dataStorageLayer/syncData.py 
+wait 

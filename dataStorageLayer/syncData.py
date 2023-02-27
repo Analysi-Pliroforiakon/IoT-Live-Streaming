@@ -5,48 +5,65 @@ import argparse
 
 # you must specify the table of kafka
 
-parser = argparse.ArgumentParser(
-    description="Sync your data from kafka topic to hbase",
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter
-)
+# parser = argparse.ArgumentParser(
+#     description="Sync your data from kafka topic to hbase",
+#     formatter_class=argparse.ArgumentDefaultsHelpFormatter
+# )
 
-requiered = parser._action_groups.pop()
-requiered.add_argument('-t', '--table', type=str, default='raw',
-                help='Table name in HBase', required=True)
-parser._action_groups.append(requiered)
-args = parser.parse_args()
+# requiered = parser._action_groups.pop()
+# requiered.add_argument('-t', '--table', type=str, default='raw',
+#                 help='Table name in HBase', required=True)
+# parser._action_groups.append(requiered)
+# args = parser.parse_args()
 
 
 KAFKA_BOOTSTRAP = 'localhost:9092'
 HBASE_SERVER = 'localhost'
 HBASE_PORT = 9090
-# TOPICS = ['raw','aggregated', 'late']
-TOPIC = args.table
+TOPICS = ['raw','aggregated', 'late']
+# TOPIC = args.table
 RUNNING = True
 
 
 conn = None
 table = None
 
+rawCount = 0
+aggregatedCount = 0
+lateCount = 0
 
-def valid_table_and_connection(tableName):
-    pool = happybase.ConnectionPool(size=3, host=HBASE_SERVER, port=HBASE_PORT)
-    with pool.connection() as conn:
+def print_valid_msg(topic):
+    global rawCount, aggregatedCount, lateCount
+    if topic == 'raw':
+        if rawCount%100 == 0:
+            print("raw count: ", rawCount)
+        rawCount += 1
+    elif topic == 'aggregated':
+        if aggregatedCount%5 == 0:
+            print("aggregated count: ", aggregatedCount)
+        aggregatedCount += 1
+    elif topic == 'late':
+        if lateCount > 0:
+            print("late count: ", lateCount)
+        lateCount += 1
     
-        print("Connection: ",conn)
-        # check if tables exist
-        tables = conn.tables()
-        # decode the byte array to string
-        tables = [x.decode('utf-8') for x in tables]
+    
+   
+def valid_table_and_connection(tableNames):
+    conn = happybase.Connection( host=HBASE_SERVER, port=HBASE_PORT)
 
-        print("Tables: ",tables)
-        if tableName not in tables:
+    # check if tables exist
+    tables = conn.tables()
+    # decode the byte array to string
+    tables = [x.decode('utf-8') for x in tables]
+    tablesDict ={}
+    for name in tableNames:
+        if name in tables:
+            tablesDict[name] = conn.table(name)
+        else:
             print("Table does not exist")
             exit(1)
-        else :
-            table = conn.table(tableName)
-            print("Table exists")
-    return pool, table
+    return conn, tablesDict
 
 
 def valid_datetime(table):
@@ -60,7 +77,7 @@ def valid_datetime(table):
     max_timestamp = max(data)
     return max_timestamp
 
-def basic_consume_loop(consumer, topics, validate=False, max_timestamp=None):
+def basic_consume_loop(consumer, topics):
     try:
         consumer.subscribe(topics)
 
@@ -76,7 +93,7 @@ def basic_consume_loop(consumer, topics, validate=False, max_timestamp=None):
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
-                msg_process(msg, validate, max_timestamp=max_timestamp)
+                msg_process(msg)
     finally:
         # Close down consumer to commit final offsets.
         consumer.close()
@@ -85,9 +102,11 @@ def shutdown():
     RUNNING = False
 
 def validate_mgs(msg):
+    topic = msg.topic()
     msg = msg.value().decode('utf-8')
-    print(msg, type(msg))
-
+    if topic != 'raw':
+        print(msg, type(msg))
+    
     # split data into sensor, timestamp and value
     parsed = msg.split("|")
     
@@ -117,33 +136,26 @@ def validate_mgs(msg):
         'cf:value'.encode('utf-8'): value.encode('utf-8'),
         'cf:datetime'.encode('utf-8'): timestamp.encode('utf-8')
     }
-    return rowKey, dataToPut, timestamp
+    return rowKey, dataToPut, timestamp, topic
 
-def msg_process(msg, validate=False, max_timestamp=None):
+def msg_process(msg):
     # logic of msg processing
-    rowKey, dataToPut, timestamp = validate_mgs(msg)
-
-    if validate and timestamp <= max_timestamp:
-        print(timestamp, max_timestamp)
+    rowKey, dataToPut, timestamp, topic = validate_mgs(msg)
+    # check if the connection is still valid    
+    
+    try:
+        tablesDict[topic+"Data"].put(
+            row=rowKey,
+            data=dataToPut
+        )
+        print_valid_msg(topic)
+    except Exception as e:
+        print('ERROR: ', e)
         print("-----------------------------------------------------------------------")
-        print("Data is late")
+        print("Error in putting data")
         print(dataToPut)
         print("-----------------------------------------------------------------------")
-        return
-    # check if conn is valid
-    with pool.connection() as conn:  
-        try:
-            table.put(
-                row=rowKey,
-                data=dataToPut
-            )
-        except Exception as e:
-            print(e)
-            print("-----------------------------------------------------------------------")
-            print("Error in putting data")
-            print(dataToPut)
-            print("-----------------------------------------------------------------------")
-            pass
+        pass
 
 
 
@@ -156,13 +168,15 @@ conf = {
     
 }
 
+tableNames = []
+for topic in TOPICS:
+    tableNames.append(topic+"Data")
 
-tableName = TOPIC + "Data"
 consumer = Consumer(conf)
-pool, table =  valid_table_and_connection(tableName=tableName)
+conn, tablesDict =  valid_table_and_connection(tableNames=tableNames)
 # max timestamp is the latest timestamp already in the table .
 # if TOPIC == 'aggregated' :
 #     max_timestamp = valid_datetime(table=table)
 #     basic_consume_loop(consumer, TOPICs=[TOPIC], validate=True, max_timestamp=max_timestamp)
 #     continue
-basic_consume_loop(consumer, topics=[TOPIC])
+basic_consume_loop(consumer, topics=TOPICS)
