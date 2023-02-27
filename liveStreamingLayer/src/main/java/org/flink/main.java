@@ -20,14 +20,14 @@ public class main {
 
         DataStreamClass temperatureDataStream = new DataStreamClass();
 
-        temperatureDataStream.startFlinking(env, new AverageAggregator(), new DiffAggregator(), new RestAggregator(), temperatureKafka.getKafkaSource(), "Average Temperature", 96);
+        temperatureDataStream.startFlinking(env, new AverageAggregator(), new DiffAggregator(), new RestAggregator(), temperatureKafka.getKafkaSource(), "Average Temperature");
         // for energy topic -> Sum wh for each sensor
         KafkaFlinkReceiver energyKafka = new KafkaFlinkReceiver( );
         energyKafka.myKafkaSource(new String[]{inputTopics[1]}, "localhost:9092" );
 
         DataStreamClass energyDataStream = new DataStreamClass();
 
-        energyDataStream.startFlinking(env, new SumAggregator(), new DiffAggregator(), new RestAggregator(), energyKafka.getKafkaSource(), "Sum Energy", 96);
+        energyDataStream.startFlinking(env, new SumAggregator(), new DiffAggregator(), new RestAggregator(), energyKafka.getKafkaSource(), "Sum Energy");
 
         // water -> Sum water for each sensor
         KafkaFlinkReceiver waterKafka = new KafkaFlinkReceiver( );
@@ -35,7 +35,7 @@ public class main {
 
         DataStreamClass waterDataStream = new DataStreamClass();
 
-        waterDataStream.startFlinking(env, new SumAggregator(), new DiffAggregator(), new RestAggregator(), waterKafka.getKafkaSource(), "Sum Water", 96);
+        waterDataStream.startFlinking(env, new SumAggregator(), new DiffAggregator(), new RestAggregator(), waterKafka.getKafkaSource(), "Sum Water");
         
         //motion -> Count motion detections per day
         KafkaFlinkReceiver motionKafka = new KafkaFlinkReceiver();
@@ -43,7 +43,7 @@ public class main {
         
         DataStreamClass motionDataStream = new DataStreamClass();
         
-        motionDataStream.startFlinking(env, new MovCountAggregator(), new DiffAggregator(), new RestAggregator(), motionKafka.getKafkaSource(), "Count Motion", 96);
+        motionDataStream.startFlinking(env, new MovCountAggregator(), new DiffAggregator(), new RestAggregator(), motionKafka.getKafkaSource(), "Count Motion");
       
         env.execute("Flink Streaming Java API Skeleton");
     }

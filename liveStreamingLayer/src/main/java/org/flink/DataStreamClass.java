@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public class DataStreamClass {
 
-    public void startFlinking(StreamExecutionEnvironment env, AggregateFunction<ourTuple, aggregateHelper, ourTuple> quarterAggregateFunction, AggregateFunction<ourTuple, aggregateHelper, ourTuple> dailyAggregateFunction, AggregateFunction<ourTuple, aggregateHelper, ourTuple> restAggregateFunction, KafkaSource<String> kafkaSource, String jobName, int dailyPeriod) throws Exception {
+    public void startFlinking(StreamExecutionEnvironment env, AggregateFunction<ourTuple, aggregateHelper, ourTuple> quarterAggregateFunction, AggregateFunction<ourTuple, aggregateHelper, ourTuple> dailyAggregateFunction, AggregateFunction<ourTuple, aggregateHelper, ourTuple> restAggregateFunction, KafkaSource<String> kafkaSource, String jobName) throws Exception {
         
     	//This is used to handle rejected late events
     	final OutputTag<ourTuple> lateOutputTag = new OutputTag<ourTuple>("late-data"){
@@ -60,22 +60,43 @@ public class DataStreamClass {
         
     	DataStream<ourTuple> finalStream = newStream.union(totStream);
 
-////        make connection for hbase sink
-//        MyHbaseSink myHbaseSink = new MyHbaseSink();
-//          myHbaseSink.initialize("localhost", "2181", "rawData");
-//        finalStream.addSink(myHbaseSink.sinkFunction);
-    	
-    	KafkaSink<ourTuple> sink = KafkaSink.<ourTuple>builder()
-                .setBootstrapServers("localhost:9092")
-                .setRecordSerializer(
-                        KafkaRecordSerializationSchema.builder()
-                                .setTopic("aggrs")
-                                .setValueSerializationSchema(
-                                        new OurTupleSerializationSchema()
-                                )
-                                .build()
-                )
-                .build();
+		KafkaSink<ourTuple> rawSink = KafkaSink.<ourTuple>builder()
+				.setBootstrapServers("localhost:9092")
+				.setRecordSerializer(
+						KafkaRecordSerializationSchema.builder()
+								.setTopic("raw")
+								.setValueSerializationSchema(
+										new OurTupleSerializationSchema()
+								)
+								.build()
+				)
+				.build();
+		//Sink all raw data to raw topic
+		dataStream.sinkTo(rawSink);
+
+		KafkaSink<ourTuple> aggregatedSink = KafkaSink.<ourTuple>builder()
+				.setBootstrapServers("localhost:9092")
+				.setRecordSerializer(
+						KafkaRecordSerializationSchema.builder()
+								.setTopic("aggregated")
+								.setValueSerializationSchema(
+										new OurTupleSerializationSchema()
+								)
+								.build()
+				)
+				.build();
+
+		KafkaSink<ourTuple> lateSink = KafkaSink.<ourTuple>builder()
+				.setBootstrapServers("localhost:9092")
+				.setRecordSerializer(
+						KafkaRecordSerializationSchema.builder()
+								.setTopic("late")
+								.setValueSerializationSchema(
+										new OurTupleSerializationSchema()
+								)
+								.build()
+				)
+				.build();
 
     	//Checking if topic is energy or water. If true calculate rest aggregator
     	//Filters out Not Applicable aggregation
@@ -83,29 +104,33 @@ public class DataStreamClass {
     	    SingleOutputStreamOperator<ourTuple> restStream =  finalStream
     	    		.windowAll(TumblingEventTimeWindows.of(Time.days(1), Time.minutes(-119)))
     	    		.aggregate(restAggregateFunction);
-    	    		
+    	    
+    	    //Sink AggDay and AggDayDiff data to aggregated topic		
             finalStream
 	            .filter(value -> !value.sensor.contains("NotApplicable"))
-	            .sinkTo(sink);
+	            .sinkTo(aggregatedSink);
             System.out.println("Adding a sink done");
             
+           //Sink AggRest data to aggregated topic
             restStream
 	            .filter(value -> !value.sensor.contains("NotApplicable"))
-	            .sinkTo(sink);
+	            .sinkTo(aggregatedSink);
             System.out.println("Adding rest sink done");
             
             //This is the dataStream of late rejected events
             DataStream<ourTuple> lateStream = newStream.getSideOutput(lateOutputTag);
-            lateStream.sinkTo(sink);
+            
+            //Sink late rejected data to late topic
+            lateStream.sinkTo(lateSink);
     	    
     	}
         
     	//If topic is not energy or water, do not calculate rest aggregator
     	else {
-
+    		//Sink AggDay and AggDayMov data to aggregated topic
     		finalStream
 	            .filter(value -> !value.sensor.contains("NotApplicable"))
-	            .sinkTo(sink);
+	            .sinkTo(aggregatedSink);
             System.out.println("Adding a sink done");
             
     	}

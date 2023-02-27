@@ -4,7 +4,9 @@ import org.apache.flink.api.common.functions.AggregateFunction;
 
 public class DiffAggregator implements AggregateFunction<ourTuple, aggregateHelper, ourTuple> {
 
-        @Override
+	private static final long serialVersionUID = 1L;
+
+		@Override
         public aggregateHelper createAccumulator() {
             return new aggregateHelper();
         }
