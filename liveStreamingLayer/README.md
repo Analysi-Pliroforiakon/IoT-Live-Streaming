@@ -4,6 +4,9 @@
 
 - flink-1.16.0
 
+## Run Live Streaming Layer
+java -jar YoutPathTo\APS\liveStreamingLayer\flinkExecutable.jar
+
 ## Setup in Eclipse IDE
 
 - File > Import... > Select an import wizard > Maven > Existing Maven Project
@@ -36,11 +39,11 @@
 
 # Normal aggragations and data flow.
 
-1. All data , late and normal, are accepted by flink and then we sink them to a new kafka topic `raw`.
+1. All data, late and normal are accepted by flink and then we sink them to a new kafka topic `raw`.
 2. After the aggregations are calculated we filter the late event data, then we sink them to a new kafka topic `aggregated`.
 3. The late event data then are sinked to the `late` topic.
 
-# How we habdle late events.
+# How we handle late events.
 
 The only sensor that produces late events data is the water sensor.
 
@@ -48,10 +51,10 @@ The only sensor that produces late events data is the water sensor.
 
 There are 2 types of late event data.
 
-1. The 2 day late events.
-2. The 10 day late events.
+1. The 2 day late events (accepted).
+2. The 10 day late events (rejected).
 
 ## Late event flow.
 
-The 2 days late data are normaly returned to kafka from flink since we allow to include them to the aggregations and we send them to the kafka topic `aggragated`.
-The 10 days late data are inputted to a new kafka topic `late`.
+The 2 days late data are normally returned to kafka topic `raw` from flink and we also include them to the aggregations which are sent to the kafka topic `aggragated`.
+The 10 days late data are inputted both to a separate kafka topic `late` and the `raw` topic.
