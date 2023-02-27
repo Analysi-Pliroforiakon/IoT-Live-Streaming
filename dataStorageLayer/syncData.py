@@ -7,8 +7,7 @@ import sys
 KAFKA_BOOTSTRAP = 'localhost:9092'
 HBASE_SERVER = 'localhost'
 HBASE_PORT = 9090
-TOPIC_NAME = 'aggregated'
-TABLE_NAME = TOPIC_NAME+'Data'
+TOPICS = ['raw','aggregated', 'late']
 RUNNING = True
 
 
@@ -16,7 +15,7 @@ conn = None
 table = None
 
 
-def valid_table_and_connection():
+def valid_table_and_connection(tableName):
     pool = happybase.ConnectionPool(size=3, host=HBASE_SERVER, port=HBASE_PORT)
     with pool.connection() as conn:
     
@@ -27,16 +26,16 @@ def valid_table_and_connection():
         tables = [x.decode('utf-8') for x in tables]
 
         print("Tables: ",tables)
-        if TABLE_NAME not in tables:
+        if tableName not in tables:
             print("Table does not exist")
             exit(1)
         else :
-            table = conn.table(TABLE_NAME)
+            table = conn.table(tableName)
             print("Table exists")
     return pool, table
 
 
-def valid_datetime():
+def valid_datetime(table):
     data = table.scan(columns=['cf:datetime'])
     # decode the byte array to string
     data = list(data)
@@ -47,7 +46,7 @@ def valid_datetime():
     max_timestamp = max(data)
     return max_timestamp
 
-def basic_consume_loop(consumer, topics):
+def basic_consume_loop(consumer, topics, validate=False, max_timestamp=None):
     try:
         consumer.subscribe(topics)
 
@@ -63,7 +62,7 @@ def basic_consume_loop(consumer, topics):
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
-                msg_process(msg)
+                msg_process(msg, validate, max_timestamp=max_timestamp)
     finally:
         # Close down consumer to commit final offsets.
         consumer.close()
@@ -71,8 +70,7 @@ def basic_consume_loop(consumer, topics):
 def shutdown():
     RUNNING = False
 
-def msg_process(msg):
-    # logic of msg processing
+def validate_mgs(msg):
     msg = msg.value().decode('utf-8')
     print(msg, type(msg))
 
@@ -105,9 +103,13 @@ def msg_process(msg):
         'cf:value'.encode('utf-8'): value.encode('utf-8'),
         'cf:datetime'.encode('utf-8'): timestamp.encode('utf-8')
     }
+    return rowKey, dataToPut, timestamp
 
+def msg_process(msg, validate=False, max_timestamp=None):
+    # logic of msg processing
+    rowKey, dataToPut, timestamp = validate_mgs(msg)
 
-    if timestamp <= max_timestamp:
+    if validate and timestamp <= max_timestamp:
         print(timestamp, max_timestamp)
         print("-----------------------------------------------------------------------")
         print("Data is late")
@@ -115,7 +117,7 @@ def msg_process(msg):
         print("-----------------------------------------------------------------------")
         return
     # check if conn is valid
-    with pool.connection() as conn:
+    with pool.connection() as conn:  
         try:
             table.put(
                 row=rowKey,
@@ -140,7 +142,13 @@ conf = {
     
 }
 
-consumer = Consumer(conf)
-pool, table =  valid_table_and_connection()
-max_timestamp = valid_datetime()
-basic_consume_loop(consumer, topics=[TOPIC_NAME])
+for topic in TOPICS:
+    tableName = topic + "Data"
+    consumer = Consumer(conf)
+    pool, table =  valid_table_and_connection(tableName=tableName)
+    # max timestamp is the latest timestamp already in the table .
+    if topic == 'aggregated' :
+        max_timestamp = valid_datetime(table=table)
+        basic_consume_loop(consumer, topics=[topic], validate=True, max_timestamp=max_timestamp)
+        continue
+    basic_consume_loop(consumer, topics=[topic])
