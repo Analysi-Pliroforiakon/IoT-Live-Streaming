@@ -10,6 +10,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - bridge
 
   kafka0:
     image: confluentinc/cp-kafka:7.3.1
@@ -32,6 +34,9 @@ services:
       KAFKA_JMX_PORT: 9999
       KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
       KAFKA_LOG_RETENTION_BYTES: 26214400 # set max partition size equal to 25MB
+    networks:
+      - bridge
+
   kafka1:
     image: confluentinc/cp-kafka:7.3.1
     hostname: kafka1
@@ -52,6 +57,8 @@ services:
       KAFKA_JMX_PORT: 9999
       KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka1 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
       KAFKA_LOG_RETENTION_BYTES: 26214400
+    networks:
+      - bridge
       
   kafka2:
     image: confluentinc/cp-kafka:7.3.1
@@ -73,6 +80,8 @@ services:
       KAFKA_JMX_PORT: 9999
       KAFKA_JMX_OPTS: "-Djava.rmi.server.hostname=kafka2 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
       KAFKA_LOG_RETENTION_BYTES: 26214400
+    networks:
+      - bridge
 
   topics_setup:
     image: confluentinc/cp-kafka:7.3.1
@@ -88,6 +97,8 @@ services:
     entrypoint: sh -c "/setup_topics.sh"
     stdin_open: true
     tty: true
+    networks:
+        - bridge
     
   cmak:
     image: ghcr.io/eshepelyuk/dckr/cmak-3.0.0.5:latest
@@ -100,6 +111,8 @@ services:
       - "9000:9000"
     environment:
       ZK_HOSTS: "zookeeper:2181"
+    networks:
+      - bridge
 
   cmak2zk:
     image: ghcr.io/eshepelyuk/dckr/cmak2zk:latest
@@ -112,6 +125,8 @@ services:
       - "zookeeper"
     volumes:
       - "${PWD}/messagingBrokerLayer/cmak_cluster_config.yaml:/app/etc/cmak_cluster_config.yaml:ro"
+    networks:
+      - bridge
 
   hbase:
     image: dajobe/hbase
@@ -123,8 +138,11 @@ services:
       - "8085:8085"   # REST UI
       - "9090:9090"   # Thrift API
       - "9095:9095"   # Thrift UI
+      - "2182:2181"   # Zookeeper
     volumes:
       - ${PWD}/dataStorageLayer/hbase_files/data:/data
+    networks:
+      - bridge
 
   grafana:
     image: grafana/grafana-oss
@@ -134,5 +152,16 @@ services:
       - "3000:3000"
     environment:
       GF_INSTALL_PLUGINS: "golioth-websocket-datasource"
+    networks:
+      - bridge
     # volumes:
     #   - ../presentationLayer:/imports_exports
+
+networks:
+  bridge:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+          gateway: 172.16.238.1
