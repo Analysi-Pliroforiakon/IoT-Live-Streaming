@@ -6,9 +6,9 @@ const hbase = require('hbase');
 const client = hbase({ host: '127.0.0.1', port: 8080 });
 
 var tables = {
-    raw: {name: 'raw', startRow: '0000000000'},
-    aggregated: {name: 'aggregated', startRow: '0000000000'},
-    late: {name: 'late', startRow: '0000000000'}
+    raw: {name: 'rawData', startRow: '0000000000'},
+    aggregated: {name: 'aggregatedData', startRow: '0000000000'},
+    late: {name: 'lateData', startRow: '0000000000'}
 }
 
 const wss = new WebSocket.Server({ server: server });
@@ -68,13 +68,13 @@ function handle_new_rows (table) {
             var grouped_rows = {};
             rows.forEach(function (row) {
                 if (grouped_rows[row.key] == undefined) {
-                    grouped_rows[row.key] = {measurement: null, value: null, timestamp: null, late_rejected: table == 'late'};
+                    grouped_rows[row.key] = {measurement: null, value: null, timestamp: null, late_rejected: table == 'lateData'};
                 }
-                if (row.column == 'f:measurement') {
+                if (row.column == 'cf:sensor') {
                     grouped_rows[row.key].measurement = row.$;
-                } else if (row.column == 'f:value') {
+                } else if (row.column == 'cf:value') {
                     grouped_rows[row.key].value = row.$;
-                } else if (row.column == 'f:timestamp') {
+                } else if (row.column == 'cf:datetime') {
                     grouped_rows[row.key].timestamp = row.$;
                 } else {
                     console.error('Unknown column: %s', row.column);
