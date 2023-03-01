@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 7,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -43,7 +43,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
-            "barAlignment": 0,
+            "barAlignment": -1,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -52,7 +52,237 @@
               "tooltip": false,
               "viz": false
             },
+            "lineInterpolation": "stepBefore",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "golioth-websocket-datasource",
+            "uid": "6ZP4WnbVz"
+          },
+          "fields": [
+            {
+              "jsonPath": "$.measurement",
+              "language": "jsonpath",
+              "name": "",
+              "type": "string"
+            },
+            {
+              "jsonPath": "$.value",
+              "language": "jsonpath",
+              "name": "",
+              "type": "number"
+            },
+            {
+              "jsonPath": "$.timestamp",
+              "language": "jsonpath",
+              "name": "",
+              "type": "time"
+            }
+          ],
+          "path": "/agg",
+          "refId": "A",
+          "withStreaming": true
+        }
+      ],
+      "title": "AggDay[THx]",
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "AggDay[TH1]"
+                  }
+                },
+                "fieldName": "measurement"
+              },
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "AggDay[TH2]"
+                  }
+                },
+                "fieldName": "measurement"
+              }
+            ],
+            "match": "any",
+            "type": "include"
+          }
+        },
+        {
+          "id": "prepareTimeSeries",
+          "options": {
+            "format": "many"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "golioth-websocket-datasource",
+        "uid": "6ZP4WnbVz"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "golioth-websocket-datasource",
+            "uid": "6ZP4WnbVz"
+          },
+          "fields": [
+            {
+              "jsonPath": "$.measurement",
+              "language": "jsonpath",
+              "name": ""
+            },
+            {
+              "jsonPath": "$.value",
+              "language": "jsonpath",
+              "name": ""
+            },
+            {
+              "jsonPath": "$.timestamp",
+              "language": "jsonpath",
+              "name": ""
+            }
+          ],
+          "path": "/late",
+          "refId": "A",
+          "withStreaming": true
+        }
+      ],
+      "title": "Late Rejected Events",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "golioth-websocket-datasource",
+        "uid": "6ZP4WnbVz"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 18,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -89,7 +319,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 8
       },
       "id": 2,
       "options": {
@@ -119,10 +349,123 @@
               "type": "string"
             },
             {
-              "jsonPath": "$.late_rejected",
+              "jsonPath": "$.value",
               "language": "jsonpath",
               "name": "",
-              "type": "boolean"
+              "type": "number"
+            },
+            {
+              "jsonPath": "$.timestamp",
+              "language": "jsonpath",
+              "name": "",
+              "type": "time"
+            }
+          ],
+          "path": "/raw/temperature",
+          "refId": "A",
+          "withStreaming": true
+        }
+      ],
+      "title": "TH",
+      "transformations": [
+        {
+          "id": "prepareTimeSeries",
+          "options": {
+            "format": "many"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "golioth-websocket-datasource",
+        "uid": "6ZP4WnbVz"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepBefore",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.3.6",
+      "targets": [
+        {
+          "datasource": {
+            "type": "golioth-websocket-datasource",
+            "uid": "6ZP4WnbVz"
+          },
+          "fields": [
+            {
+              "jsonPath": "$.measurement",
+              "language": "jsonpath",
+              "name": "",
+              "type": "string"
             },
             {
               "jsonPath": "$.value",
@@ -137,12 +480,12 @@
               "type": "time"
             }
           ],
-          "path": "",
+          "path": "/raw/energy/MiAC",
           "refId": "A",
           "withStreaming": true
         }
       ],
-      "title": "Temperature Sensors",
+      "title": "MiAC",
       "transformations": [
         {
           "id": "filterByValue",
@@ -152,25 +495,7 @@
                 "config": {
                   "id": "equal",
                   "options": {
-                    "value": false
-                  }
-                },
-                "fieldName": "late_rejected"
-              }
-            ],
-            "match": "any",
-            "type": "include"
-          }
-        },
-        {
-          "id": "filterByValue",
-          "options": {
-            "filters": [
-              {
-                "config": {
-                  "id": "equal",
-                  "options": {
-                    "value": "TH1"
+                    "value": "MiAC1"
                   }
                 },
                 "fieldName": "measurement"
@@ -179,7 +504,7 @@
                 "config": {
                   "id": "equal",
                   "options": {
-                    "value": "TH2"
+                    "value": "MiAC2"
                   }
                 },
                 "fieldName": "measurement"
@@ -207,13 +532,13 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
-    "to": "now"
+    "from": "2020-02-28T08:52:30.000Z",
+    "to": "2020-03-03T02:37:30.000Z"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Main Dashboard",
-  "uid": "Y46SmHbVz",
+  "title": "Main dashboard",
+  "uid": "RvwEkJx4z",
   "version": 1,
   "weekStart": ""
 }
