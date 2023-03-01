@@ -92,3 +92,7 @@ Then add the datasource with this script:
 ```
 
 and at last import the dashboard from the `presentationLayer` folder, using the grafana GUI, dashboard->import.
+
+## All together
+
+We made and a run-all script that runs all the steps above. It is located in the root directory of the project and is called `post_setup.sh`. It is not recommended to use this script to run the system because of the that processes are not killed when the script is terminated. It is recommended to run the steps above manually.
