@@ -3,19 +3,6 @@ import happybase
 import sys
 import argparse
 
-# you must specify the table of kafka
-
-# parser = argparse.ArgumentParser(
-#     description="Sync your data from kafka topic to hbase",
-#     formatter_class=argparse.ArgumentDefaultsHelpFormatter
-# )
-
-# requiered = parser._action_groups.pop()
-# requiered.add_argument('-t', '--table', type=str, default='raw',
-#                 help='Table name in HBase', required=True)
-# parser._action_groups.append(requiered)
-# args = parser.parse_args()
-
 
 KAFKA_BOOTSTRAP = 'localhost:9092'
 HBASE_SERVER = 'localhost'
@@ -174,9 +161,4 @@ for topic in TOPICS:
 
 consumer = Consumer(conf)
 conn, tablesDict =  valid_table_and_connection(tableNames=tableNames)
-# max timestamp is the latest timestamp already in the table .
-# if TOPIC == 'aggregated' :
-#     max_timestamp = valid_datetime(table=table)
-#     basic_consume_loop(consumer, TOPICs=[TOPIC], validate=True, max_timestamp=max_timestamp)
-#     continue
 basic_consume_loop(consumer, topics=TOPICS)
