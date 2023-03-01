@@ -16,12 +16,9 @@ public class DiffAggregator implements AggregateFunction<ourTuple, aggregateHelp
         	aggregateHelper.setVariant("AggDayDiff", tuple.sensor);
             aggregateHelper.timestamp = tuple.datetime;
             //This is difference (last value - new value)
-//            System.out.println("Previous value: " +  aggregateHelper.sum);
             aggregateHelper.count = tuple.value - aggregateHelper.sum;
-//            System.out.println("Diff: " + aggregateHelper.count);
             //This is new measurement
             aggregateHelper.sum = tuple.value;
-//            System.out.println(aggregateHelper.sum);
             return aggregateHelper;
         }
 
@@ -45,10 +42,4 @@ public class DiffAggregator implements AggregateFunction<ourTuple, aggregateHelp
             aggregateHelper.count = acc1.count;
             return aggregateHelper;
         }
-        
-//        public void reset(aggregateHelper acc1) {
-//        	acc1.sum = 0f;
-//        	acc1.count = 0;
-//        }
-
 }

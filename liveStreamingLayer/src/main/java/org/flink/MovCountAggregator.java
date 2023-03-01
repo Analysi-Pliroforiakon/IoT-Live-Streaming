@@ -26,6 +26,7 @@ public class MovCountAggregator implements AggregateFunction<ourTuple, aggregate
         public ourTuple getResult(aggregateHelper aggregateHelper) {
         	ourTuple tuple = new ourTuple();
             tuple.sensor = aggregateHelper.variant;
+            //Increase timestamp of the movement sensor so that it is correctly aligned
             try {
 				aggregateHelper.setTimestamp();
 			} catch (ParseException e) {
