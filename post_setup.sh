@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Flink" &
+
 java -jar ./liveStreamingLayer/flinkExecutable.jar &
 
 
@@ -9,7 +9,7 @@ java -jar ./liveStreamingLayer/flinkExecutable.jar &
 
 ./dataStorageLayer/sync.sh &
 
-# echo "Presentation" &
+
 ./presentationLayer/import_data_sources.sh &
 
 wait
