@@ -25,15 +25,13 @@ public class DataStreamClass {
     	final OutputTag<ourTuple> lateOutputTag = new OutputTag<ourTuple>("late-data"){
 			private static final long serialVersionUID = 1L;};
     	
-    	//Max out-of-orderness. 2 days for water, 0 for all other sensors
-    	int oooness = 0;
-    	if(jobName.contains("Water")) oooness = 2;
-    	
+    	//Out of orderness is set to 2 days for all sensors
+		//This means that all aggregations will be sent to the sink 2 days after the end of the corresponding window
     	SingleOutputStreamOperator<ourTuple> dataStream = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "KafkaSource")
                 .flatMap(new Splitter())
                 .assignTimestampsAndWatermarks(
                         WatermarkStrategy.
-                        <ourTuple>forBoundedOutOfOrderness(Duration.ofDays(oooness))
+                        <ourTuple>forBoundedOutOfOrderness(Duration.ofDays(2))
                                 .withTimestampAssigner((event, timestamp) -> event.toTimestampLong())
                                 .withIdleness(Duration.ofSeconds(1))
                 );
