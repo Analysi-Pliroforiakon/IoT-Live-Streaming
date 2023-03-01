@@ -1,4 +1,15 @@
 #!/bin/bash
 
-python ./dataStorageLayer/hbase_files/hbase_make_clear_tables.py
-./presentationLayer/import_data_sources.sh
+echo "Flink" &
+java -jar ./liveStreamingLayer/flinkExecutable.jar &
+
+
+./deviceLayer/produce.sh &
+
+
+./dataStorageLayer/sync.sh &
+
+# echo "Presentation" &
+./presentationLayer/import_data_sources.sh &
+
+wait

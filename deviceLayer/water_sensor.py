@@ -19,13 +19,13 @@ class WaterSensor():
         self.step(curr_datetime)
 
     def get_measurement(self):
-        if self.step_count % 20 == 0:
+        if (self.step_count -1) % 20 == 0:
             # Get a 2 days old measurement
             late_event = self.consumption_hist[-(2*24*15)]
         else:
             late_event = None
         
-        if self.step_count % 120 == 0:
+        if (self.step_count-1 )% 120 == 0:
             # Gat a 10 days old measurement
             very_late_event = self.consumption_hist[-(10*24*15)]
         else:

@@ -11,7 +11,9 @@ for table in tables:
             connection.delete_table(table, disable=True)
             print(f'Table {table} deleted.')
             try:
-                connection.create_table(table, { 'cf': dict() } )
+                # the minimum versions we want is 3
+                # we will add one in case of an error occurs.
+                connection.create_table(table, { 'cf': dict(max_versions=4) } )
                 print(f'Table {table} created.')
             except:
                 print(f'Table {table} already exists. Thish should not happen.')
@@ -23,7 +25,9 @@ for table in tables:
     else:
         print(f'Table {table} does not exist')
         try:
-            connection.create_table(table, { 'cf': dict() } )
+            # the minimum versions we want is 3
+            # we will add one in case of an error occurs.
+            connection.create_table(table, { 'cf': dict(max_versions=4) } )
             print(f'Table {table} created')
         except:
             print(f'Table {table} already exists')

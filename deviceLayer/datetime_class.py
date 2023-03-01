@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 import time
-
+# Class to handle datetime
+# This class is used to handle datetime in the simulation
+# It is used to get the current datetime and to increment the datetime
 class DatetimeClass():
     def __init__(self, wait_secs=1):
         self.curr_datetime = datetime(2020, 1, 1)
