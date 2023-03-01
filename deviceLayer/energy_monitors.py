@@ -1,5 +1,8 @@
 import random
 
+# This function returns the energy factor of the air conditioner
+# obiosly, it is higher whem temperature is not in the range of 16-25
+# since the air conditioner is working harder to cool or heat the room
 def air_conditioner_energyFactor(temperature):
   if temperature > 35 or temperature < 12: 
     return 3
@@ -7,7 +10,8 @@ def air_conditioner_energyFactor(temperature):
     return 2
   else :
     return 1
-
+# This function returns the energy consumption of the air conditioner
+# it is calculated based on the energy factor and the temperature
 def calculate_energyConsumption(temperature, type , randomEnergy, skew):
     if(randomEnergy):
         return random.uniform(0, 100 * type)
@@ -18,10 +22,14 @@ def calculate_energyConsumption(temperature, type , randomEnergy, skew):
         return 0
     elif(abs(temperature - 20) < 3):
         # return wattsPerHour or 0 with equal probability
-        # print('random choice for wattsPerHour: ', wattsPerHour, ' type: ', type)
         return random.choice([wattsPerHour, 0, 0])
     else:
         return wattsPerHour
+# This function returns the energy consumption of some appliances
+# If type is 2, it is a kitchen tool that is using more energy at mid day
+# it is calculated based on time of the day, mid day which is 13:00 to 15:00 
+# the microwave is using more energy -> someone is cooking.
+# if type is not 2 then it is a light bulb that is using more energy at night
 def calculate_energy_base_on_hours(curr_datetime, type , randomEnergy, skew):
     if(randomEnergy):
         return random.uniform(0, 100 * type)
@@ -38,19 +46,18 @@ def calculate_energy_base_on_hours(curr_datetime, type , randomEnergy, skew):
             return 100 * type
         else:
             return random.uniform(0, 100 * type)
+    
 def calculate_total_energyConsumption(curr_datetime, prev, self):
-    #print('hour: ', curr_datetime.hour, ' minute: ', curr_datetime.minute)
     if(curr_datetime.hour == 0 and curr_datetime.minute == 0):
 
         w =  2600 * 24 + prev + random.uniform(-1000, 1000)
         self.prevEtot = w
-        #print('returned w: ', w)
         return w
 
     else:
-        #print('returned prev: ', prev)
         return prev
-
+# Class to handle energy consumption
+# of all the appliances in the house
 class EnergyConsumption():
     def __init__(self, degresOutside, curr_datetime, skew=0, random=False):
         self.degreesOutside = degresOutside
