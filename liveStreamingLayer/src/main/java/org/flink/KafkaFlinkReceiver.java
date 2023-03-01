@@ -4,9 +4,6 @@ import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 
-//create  a KafkaRecordDeserializationSchema
-
-
 public class KafkaFlinkReceiver  {
 
     private KafkaSource<String> kafkaSource;
@@ -22,7 +19,6 @@ public class KafkaFlinkReceiver  {
 
        this.kafkaSource = source;
     }
-
 
     public KafkaSource<String> getKafkaSource() throws Exception {
         return this.kafkaSource;

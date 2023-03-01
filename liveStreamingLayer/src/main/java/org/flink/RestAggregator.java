@@ -45,7 +45,6 @@ public class RestAggregator implements AggregateFunction<ourTuple, aggregateHelp
 
         @Override
         public aggregateHelper merge(aggregateHelper aggregateHelper, aggregateHelper acc1) {
-        	
             aggregateHelper.sum += acc1.sum;
             aggregateHelper.count += acc1.count;
             return aggregateHelper;

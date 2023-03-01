@@ -39,9 +39,9 @@ java -jar YoutPathTo\APS\liveStreamingLayer\flinkExecutable.jar
 
 # Normal aggragations and data flow.
 
-1. All data, late and normal are accepted by flink and then we sink them to a new kafka topic `raw`.
-2. After the aggregations are calculated we filter the late event data, then we sink them to a new kafka topic `aggregated`.
-3. The late event data then are sinked to the `late` topic.
+1. All data, late and normal are inserted to flink and then we sink them to a new kafka topic `raw`.
+2. We calculate the aggregations including the accepted (see below) late data and excluded the rejected late data, then we sink the aggregations to a new kafka topic `aggregated`.
+3. The rejected late event data then are sinked to the `late` topic.
 
 # How we handle late events.
 
