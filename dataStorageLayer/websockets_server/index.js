@@ -11,7 +11,8 @@ var tables = {
     '/raw/energy/MiAC': {name: 'rawData', startRow: '0000000000'},
     '/raw/water': {name: 'rawData', startRow: '0000000000'},
     '/agg': {name: 'aggregatedData', startRow: '0000000000'},
-    '/late': {name: 'lateData', startRow: '0000000000'}
+    '/late': {name: 'lateData', startRow: '0000000000'},
+    '/raw/daily': {name: 'rawData', startRow: '0000000000'}
 }
 
 const wss = new WebSocket.Server({ server: server });
@@ -87,6 +88,7 @@ function handle_new_rows (table, path) {
                         (path == '/raw/temperature' && (row.key.includes('TH1') || row.key.includes('TH2'))) ||
                         (path == '/raw/energy/HVAC' && (row.key.includes('HVAC1') || row.key.includes('HVAC2'))) ||
                         (path == '/raw/energy/MiAC' && (row.key.includes('MiAC1') || row.key.includes('MiAC2'))) ||
+                        (path == '/raw/daily' && (row.key.includes('Etot') || row.key.includes('Wtot'))) ||
                         (path == '/raw/water' && (row.key.includes('W1'))) ||
                         (path == '/agg') || (path == '/late')
                     );
