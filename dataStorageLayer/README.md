@@ -1,6 +1,6 @@
 # HBase
 
-# Intrucitons
+## Intrucitons for manual installation
 
 General can be found [here](https://towardsdatascience.com/setting-up-a-standalone-hbase-local-instance-and-connect-to-it-with-python-happybase-9751c9fe6941)
 Basicly there are the steps.
@@ -49,19 +49,14 @@ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 ./bin/start-hbase.sh
 ```
 
-# WSL and Windows
+## WSL and Windows
 
-In order to make this work , check the host address of the WSL with this command.
+We do NOT recommend to use WSL for HBase. It is not stable and it is not easy to install.
 
-```
-wsl hostname -I
-```
+## Late rejected.
 
-# Late rejected.
-
-Τα 10 μέρες πίσω φιλτράρονται και αποστέλλονται σε διαφορετικό stream (πχ topic στον kafka)
-και γράφονται και στην βάση και σε διαφορετικό σημείο (σε δύο «tables»). Επιπλέον τα δεδομένα
-αυτά απεικονίζονται και στο Grafana στην συνέχεια στο αντίστοιχο table
+Late rejected data , is data that is rejected because they are received after the aggregation time.
+The assignment says that we should store late data and in a
 
 # Flow
 
@@ -92,6 +87,6 @@ There are 3 tables.
 
 | Table Name     | Use Case                        | Row Key                  | Sensor                                                         | Value                        | Datetime         |
 | -------------- | ------------------------------- | ------------------------ | -------------------------------------------------------------- | ---------------------------- | ---------------- |
-| rawData        | Store the data, late and normal | {SensorValue}+{DateTime} | The sensor name, eg TH1,MiAc2                                  | The value of the metric      | YYYY-MM-DD HH:mm |
-| aggregatedData | Store only the aggragated data. | {Aggregation}+{DateTime} | Aggregatio name you may see the live streaming layer for that. | The value of the aggragation | YYYY-MM-DD HH:mm |
-| lateData       | Store only the late data.       | {SensorValue}+{DateTime} | The sensor name, eg TH1,MiAc2                                  | The value of the metric      | YYYY-MM-DD HH:mm |
+| rawData        | Store the data, late and normal | {DateTime}+{SensorValue} | The sensor name, eg TH1,MiAc2                                  | The value of the metric      | YYYY-MM-DD HH:mm |
+| aggregatedData | Store only the aggragated data. | {DateTime}+{Aggregation} | Aggregatio name you may see the live streaming layer for that. | The value of the aggragation | YYYY-MM-DD HH:mm |
+| lateData       | Store only the late data.       | {DateTime}+{SensorValue} | The sensor name, eg TH1,MiAc2                                  | The value of the metric      | YYYY-MM-DD HH:mm |

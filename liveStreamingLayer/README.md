@@ -1,10 +1,14 @@
 # Flink
 
+Live Streaming Layer.
+
 ## Requirements
 
 - flink-1.16.0
+- java 11, jdk
 
 ## Run Live Streaming Layer
+
 java -jar YoutPathTo\APS\liveStreamingLayer\flinkExecutable.jar
 
 ## Setup in Eclipse IDE
