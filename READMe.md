@@ -1,6 +1,6 @@
 # IoT Live Streaming System for Information Systems Course
 
-This is a project for the Information Systems course at the NTUA. The goal of this project is to create a live streaming system for IoT devices. 
+This is a project for the Information Systems course at the NTUA. The goal of this project is to create a live streaming system for IoT devices.
 
 ## System Architecture
 
@@ -18,7 +18,6 @@ The system system's data flow is as follows:
 
 5. A Grafana instance is used to visualize the data stored in the Hbase instance. The data gets transfered using a Node.js Websocket server that periodically queries the Hbase instance.
 
-
 ## Installation
 
 ### Step 1: Clone the repository
@@ -29,4 +28,67 @@ $ git clone URL
 
 ### Step 2: Install Docker and Docker-Compose
 
-Refer 
+Refer
+
+### Step 3: Docker compose
+
+Inside the root directory of the project run the following command to start the system:
+
+```
+docker-compose up
+```
+
+### Step 4: Live Streaming Layer
+
+Requires java 11, jdk.
+
+```
+java -jar liveStreamingLayer/flinkExecutable.jar
+```
+
+### Step 5: Device Layer
+
+This is the producer of the data of the IoT devices.
+Requires python 3, confluent_kafka, numpy, pillow, matplotlib, scipy.
+
+```
+python3 deviceLayer/run_producer.py
+```
+
+### Step 6: Data Storage Layer - Syncing
+
+This takes the data from the kafka topic and puts it in the hbase database.
+
+```
+./dataStorageLayer/sync.sh
+```
+
+### Step 7: Websocket Server
+
+This is the server that connects the grafana dashboard to the hbase database. Go to `/dataStorageLayer/websockets_server` and run the following command:
+
+```
+npm install
+```
+
+and then
+
+```
+npm run start
+```
+
+### Step 8: Grafana set up
+
+Go to `http://localhost:3000` and log in with the following credentials:
+
+```
+admin - admin
+```
+
+Then add the datasource with this script:
+
+```
+./presentationLayer/import_data_sources.sh
+```
+
+and at last import the dashboard from the `presentationLayer` folder, using the grafana GUI, dashboard->import.
